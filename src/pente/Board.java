@@ -8,6 +8,8 @@ public class Board{
 	private int size;
 	// Used to have easy access to number of pieces on board. Needed for quick comparisons
 	private int numPieces;
+	// Same dealio
+	private int moveNum;
 
 	public Board(int dimension, int numPlayers){
 		size = dimension;
@@ -16,25 +18,24 @@ public class Board{
 		numPieces = 0;
 	}
 
-	public void makeMove(Player player, int x, int y){
-		if(board[r][c] == 0){
-			board[r][c] = Player.getNumber();
+	public void makeMove(Move m){
+		if(board[m.row][m.col] == 0){
+			board[m.row][m.col] = m.player;
 
 			this.updateHash();
 			moveNum++;
 		}
 		else
-			throw new IllegalArgumentException(String.format("Invalid move, position %d, %d is 
-															  occupied", x, y));
+			throw new IllegalArgumentException(String.format("Invalid move, position %d, %d is occupied", m.row, m.col));
 	}
 
 	/*
 		??
-		@param player
+		@param player Number of the player 
 		@param length
 		@return
 	*/
-	public lookForChains(int player, int length){
+	public void lookForChains(int player, int length){
 
 	}
 	
@@ -45,7 +46,15 @@ public class Board{
 	public boolean boardFull(){
 		return numPieces == size*size;
 	}
-
+//TODO haha yeah lol
+	public int getWinner(){
+		return -1;
+	}
+	
+	public boolean gameOver(){
+		return false;
+	}
+//
 	// Getters
 
 	public int[][] getBoard(){
@@ -56,12 +65,16 @@ public class Board{
 		return numPieces;
 	}
 
+	public int getSize(){
+		return size;
+	}
+
 	/*
 		Returns a string representing the board. Pieces are displayed according to the number of the
 		player that placed them. Empty locations are displayed as zeros
 		@return 	the string representing the board
 	*/
-	@override
+	@Override
 	public String toString(){
 		String text = "";
 		for(int r = 0; r < size; r++){
@@ -74,22 +87,35 @@ public class Board{
 		return text;
 	}
 
-
+	// TODO add captured pieces
 	/*
 		Checks if two boards are the same. First a quick check is done to see if the boards contain
 		the same number of pieces. If they do, the board array is checked element by element
 		@return 	whether or not the boards are the same
 	*/
-	@override
 	public boolean equals(Board other){
 		if(numPieces != other.getNumPieces())
 			return false;
-		return deepEquals(board, other.getBoard());
+		if(size != other.getSize())
+			return false;
+		int[][] otherBoard = other.getBoard();
+		for(int r = 0; r < size; r++){
+			for(int c = 0; c < size; c++){
+				if(board[r][c] != otherBoard[r][c]){
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 
-	public void updateHash();
+	public void updateHash(){}
 
+	/*
+	*/
+	/*
 	public static ?? getHash(Board b){
 		return ??;
 	}
+	*/
 }
