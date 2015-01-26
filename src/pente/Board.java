@@ -1,27 +1,38 @@
 package pente;
 
+import java.util.ArrayList;
+
 public class Board{
-	// Array representing board. 
-	private int[][] board;
-	private int[][] table;
 	// Height and width of board (board is assumed to be square)
 	private int size;
+	// Array representing board. 
+	private int[][] board;
+	// Array indicating how many of each players pieces have been captured 
+	private int[] capturedPieces;
 	// Used to have easy access to number of pieces on board. Needed for quick comparisons
 	private int numPieces;
 	// Same dealio
 	private int moveNum;
+	// Again, used to efficiently keep track of remaining moves
+	private ArrayList<int[]> validMoves;
 
 	public Board(int dimension, int numPlayers){
 		size = dimension;
 		board = new int[size][size];
-		table = new int[size*size][numPlayers];
 		numPieces = 0;
+		capturedPieces = new int[numPlayers];
+		validMoves = new ArrayList<int[]>();
+		for(int r = 0; r < size; r++){
+			for(int c = 0; c < size; c++){
+				validMoves.add(new int[] {r, c});
+			}
+		}
 	}
 
 	public void makeMove(Move m){
 		if(board[m.row][m.col] == 0){
 			board[m.row][m.col] = m.player;
-
+			validMoves.remove(validMoves.indexOf());
 			this.updateHash();
 			moveNum++;
 		}
@@ -54,7 +65,7 @@ public class Board{
 	public boolean gameOver(){
 		return false;
 	}
-//
+
 	// Getters
 
 	public int[][] getBoard(){
@@ -67,6 +78,14 @@ public class Board{
 
 	public int getSize(){
 		return size;
+	}
+
+	public int[] getCaptures(){
+		return capturedPieces;
+	}
+
+	public ArrayList<int[]> getMoves(){
+		return validMoves;
 	}
 
 	/*
@@ -87,7 +106,6 @@ public class Board{
 		return text;
 	}
 
-	// TODO add captured pieces
 	/*
 		Checks if two boards are the same. First a quick check is done to see if the boards contain
 		the same number of pieces. If they do, the board array is checked element by element
@@ -97,6 +115,8 @@ public class Board{
 		if(numPieces != other.getNumPieces())
 			return false;
 		if(size != other.getSize())
+			return false;
+		if(!capturedPieces.equals(other.getCaptures()))
 			return false;
 		int[][] otherBoard = other.getBoard();
 		for(int r = 0; r < size; r++){
@@ -108,7 +128,7 @@ public class Board{
 		}
 		return true;
 	}
-
+	// TODO: maybe someday
 	public void updateHash(){}
 
 	/*

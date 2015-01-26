@@ -13,7 +13,7 @@ public class Game{
 	}
 
 	public void addPlayer(int which, Player p){
-		players[which] = p;
+		players[which-1] = p;
 	}
 	/*
 		TODO: Account for players getting knocked out in multiplayer?
