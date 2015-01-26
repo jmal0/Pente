@@ -31,3 +31,9 @@ fi
 if [ "$1" == "run" ]; then
 	run
 fi
+
+if [ "$1" == "test" ]; then
+	compile
+	makeJar
+	run
+fi
