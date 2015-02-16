@@ -9,45 +9,72 @@ public class Board{
 	private int[][] board;
 	// Array indicating how many of each players pieces have been captured 
 	private int[] capturedPieces;
-	// Used to have easy access to number of pieces on board. Needed for quick comparisons
-	private int numPieces;
 	// Same dealio
 	private int moveNum;
 	// Again, used to efficiently keep track of remaining moves
-	private ArrayList<int[]> validMoves;
+	private ArrayList<Move> validMoves;
+	// Number of winning player  (-1 if none)
+	private int winner;
+	// List of contiguous spaces containing same player
+	private ArrayList<Chain> chains;
+	// Length of chain needed to win
+	private final int winLength;
+
 
 	public Board(int dimension, int numPlayers){
-		size = dimension;
-		board = new int[size][size];
-		numPieces = 0;
-		capturedPieces = new int[numPlayers];
-		validMoves = new ArrayList<int[]>();
+		this.size = dimension;
+		this.board = new int[size][size];
+		this.capturedPieces = new int[numPlayers];
+		this.validMoves = new ArrayList<Move>();
+		this.chains = new ArrayList<Chain>();
+		this.updateChains();
+		this.winner = -1;
+		if(numPlayers == 2)
+			this.winLength = 5;
+		else
+			this.winLength = 4;
 		for(int r = 0; r < size; r++){
 			for(int c = 0; c < size; c++){
-				validMoves.add(new int[] {r, c});
+				validMoves.add(new Move(0, r, c));
 			}
 		}
 	}
 
-	public void makeMove(Move m){
-		if(board[m.row][m.col] == 0){
-			board[m.row][m.col] = m.player;
-			validMoves.remove(validMoves.indexOf());
-			this.updateHash();
-			moveNum++;
-		}
-		else
-			throw new IllegalArgumentException(String.format("Invalid move, position %d, %d is occupied", m.row, m.col));
+	/*
+		Makes the specified move if it is valid and returns whether or not it was
+		@param m 	
+	*/
+	public boolean makeMove(Move m){
+		if(this.board[m.row][m.col] != 0)
+			return false;
+
+		this.board[m.row][m.col] = m.player;
+		this.validMoves.remove(Move.find(validMoves, m));
+		this.updateChains();
+		this.updateHash(); // This doesn't do anything yet
+		moveNum++;
+
+		return true;
 	}
 
 	/*
-		??
-		@param player Number of the player 
-		@param length
-		@return
 	*/
-	public void lookForChains(int player, int length){
-
+	public void updateChains(){
+		int r, c;
+		// Search for chains at all board positions
+		for(r = 0; r < this.size; r++){
+			for(c = 0; c < this.size; c++){
+				// Find chains starting at index r,c
+				ArrayList<Chain> newChains = Chain.findChains(this.board, r, c);
+				// Insert new chains
+				for(Chain chain : newChains){
+					this.chains = chain.insert(this.chains);
+					if(chain.getPlayer() != 0 && chain.getLength() >= this.winLength)
+						this.winner = chain.getPlayer();
+				}
+			}
+		}
+		System.out.println(chains.size());
 	}
 	
 	/*
@@ -55,37 +82,42 @@ public class Board{
 		@return 	Whether or not the board is full
 	*/
 	public boolean boardFull(){
-		return numPieces == size*size;
+		return this.validMoves.size() == 0;
 	}
+
 //TODO haha yeah lol
 	public int getWinner(){
-		return -1;
+		return this.winner;
 	}
 	
 	public boolean gameOver(){
-		return false;
+		return this.winner != -1 || this.validMoves.size() == 0;
 	}
 
 	// Getters
 
 	public int[][] getBoard(){
-		return board;
+		return this.board;
 	}
 
 	public int getNumPieces(){
-		return numPieces;
+		return this.size*this.size - this.validMoves.size();
 	}
 
 	public int getSize(){
-		return size;
+		return this.size;
 	}
 
 	public int[] getCaptures(){
-		return capturedPieces;
+		return this.capturedPieces;
 	}
 
-	public ArrayList<int[]> getMoves(){
-		return validMoves;
+	public ArrayList<Move> getMoves(){
+		return this.validMoves;
+	}
+
+	public ArrayList<Chain> getChains(){
+		return this.chains;
 	}
 
 	/*
@@ -96,9 +128,9 @@ public class Board{
 	@Override
 	public String toString(){
 		String text = "";
-		for(int r = 0; r < size; r++){
-			for(int c = 0; c < size; c++){
-				text += Integer.toString(board[r][c]);
+		for(int r = 0; r < this.size; r++){
+			for(int c = 0; c < this.size; c++){
+				text += Integer.toString(this.board[r][c]);
 			}
 			text += "\n";
 		}
@@ -111,6 +143,7 @@ public class Board{
 		the same number of pieces. If they do, the board array is checked element by element
 		@return 	whether or not the boards are the same
 	*/
+	/*
 	public boolean equals(Board other){
 		if(numPieces != other.getNumPieces())
 			return false;
@@ -128,6 +161,7 @@ public class Board{
 		}
 		return true;
 	}
+	*/
 	// TODO: maybe someday
 	public void updateHash(){}
 

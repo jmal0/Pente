@@ -11,6 +11,7 @@ public class Pente{
 		Game game = new Game(2, 19);
 		game.addPlayer(1, new RandomPlayer(1));
 		game.addPlayer(2, new RandomPlayer(2));
-		game.playGame();
+		int winner = game.playGame();
+		System.out.println(winner);
 	}
 }

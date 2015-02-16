@@ -14,8 +14,8 @@ public class RandomPlayer extends Player{
 	}
 
 	public Move getMove(Board boardState){
-		ArrayList<int[]> moves = boardState.getMoves();
-		int[] move = moves.get(rand.nextInt(moves.size()));
-		return new Move(this.getNumber(), move[0], move[1]);
+		ArrayList<Move> moves = boardState.getMoves();
+		Move move = moves.get(rand.nextInt(moves.size()));
+		return new Move(this.getNumber(), move.row, move.col);
 	}	
 }

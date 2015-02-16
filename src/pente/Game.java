@@ -2,6 +2,7 @@ package pente;
 
 import pente.Board;
 import pente.Player;
+import java.util.ArrayList;
 
 public class Game{
 	private Board board;
@@ -17,22 +18,24 @@ public class Game{
 	}
 	/*
 		TODO: Account for players getting knocked out in multiplayer?
-		@return The winner
+		@return The number of the winner
 	*/
-	public Player playGame(){
+	public int playGame(){
 		// First player is player 0
 		int nextPlayer = 0;
 		while(!board.gameOver()){
 			// Request move from player whose turn it is
 			Move m = players[nextPlayer].getMove(board);
+			System.out.println(m);
 			board.makeMove(m);
 
 			displayBoard();
+			System.out.println();
 			
 			nextPlayer = (nextPlayer + 1)%players.length;
 		}
 
-		return players[board.getWinner()];
+		return board.getWinner();
 	}
 
 	/*
