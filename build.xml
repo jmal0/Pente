@@ -23,7 +23,7 @@
 
     <target name="test" depends="compile">
         <!-- Runs the jar-->
-        <java classname="pente.Pente" failonerror="true" fork="true">
+        <java classname="pente.Pente" failonerror="true" fork="false">
             <classpath>
                 <pathelement location="${build}/jars/pente.jar"/>
                 <pathelement path="${java.class.path}:${build}/classes/pente"/>
