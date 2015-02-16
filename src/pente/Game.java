@@ -40,12 +40,6 @@ public class Game{
 			System.out.println();
 			
 			nextPlayer = (nextPlayer + 1)%players.length;
-
-			try{
-				Thread.sleep(1000);
-			} catch(InterruptedException ex){
-				Thread.currentThread().interrupt();
-			}
 		}
 
 		return board.getWinner();
