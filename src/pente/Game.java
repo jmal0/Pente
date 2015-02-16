@@ -23,12 +23,18 @@ public class Game{
 	public int playGame(){
 		// First player is player 0
 		int nextPlayer = 0;
+		boolean success;
 		while(!board.gameOver()){
 			// Request move from player whose turn it is
 			Move m = players[nextPlayer].getMove(board);
 			System.out.println(m);
-			board.makeMove(m);
+			success = board.makeMove(m);
+			if(!success){
+				System.out.println("ERROR");
+				System.exit(-1);
+			}
 
+			printCaptures();
 			displayBoard();
 			System.out.println();
 			
@@ -43,5 +49,12 @@ public class Game{
 	*/
 	public void displayBoard(){
 		System.out.println(board);
+	}
+
+	public void printCaptures(){
+		int[] captures = this.board.getCaptures();
+		for(int i = 0; i < captures.length; i++){
+			System.out.println(String.format("Player %d: %d captures", i+1, captures[i]));
+		}
 	}
 }

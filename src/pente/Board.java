@@ -1,6 +1,7 @@
 package pente;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Board{
 	// Height and width of board (board is assumed to be square)
@@ -18,7 +19,7 @@ public class Board{
 	// List of contiguous spaces containing same player
 	private ArrayList<Chain> chains;
 	// Length of chain needed to win
-	private final int winLength;
+	private static final int WIN_LENGTH = 5;
 	// Number of players in game
 	private final int numPlayers;
 	// Number of captures needed to win game
@@ -34,10 +35,6 @@ public class Board{
 		this.updateChains();
 		this.winner = -1;
 		this.numPlayers = numPlayers;
-		if(numPlayers == 2)
-			this.winLength = 5;
-		else
-			this.winLength = 4;
 		for(int r = 0; r < size; r++){
 			for(int c = 0; c < size; c++){
 				validMoves.add(new Move(0, r, c));
@@ -55,7 +52,7 @@ public class Board{
 
 		this.board[m.row][m.col] = m.player;
 		// Update list of valid moves
-		this.validMoves.remove(Move.find(validMoves, m));
+		this.validMoves.remove(Collections.binarySearch(validMoves, m));
 		// Remove any pairs
 		this.makeCaptures(m);
 		// Update list of chains
@@ -80,8 +77,9 @@ public class Board{
 				ArrayList<Chain> newChains = Chain.findChains(this.board, r, c);
 				// Insert new chains
 				for(Chain chain : newChains){
-					this.chains = chain.insert(this.chains);
-					if(chain.getPlayer() != 0 && chain.getLength() >= this.winLength)
+					int where = -Collections.binarySearch(this.chains, chain) - 1;
+					chains.add(where, chain);
+					if(chain.getPlayer() != 0 && chain.getLength() >= Board.WIN_LENGTH)
 						this.winner = chain.getPlayer();
 				}
 			}
@@ -114,47 +112,49 @@ public class Board{
 		@param m 	Current move
 	*/
 	public void makeCaptures(Move m){
-		for(int xDir = -1; xDir <= 1; xDir++){
-			for(int yDir = -1; yDir <= 1; yDir++){
+		int xDir, yDir, where;
+		Move newMove;
+		for(xDir = -1; xDir <= 1; xDir++){
+			for(yDir = -1; yDir <= 1; yDir++){
 				// Check if pair and opposite end is entirely on the board. Skip if not
 				if(m.row + 3*xDir < 0 || m.row + 3*xDir >= this.size || m.col + 3*yDir < 0 || m.col + 3*yDir >= this.size)
 					continue;
 				// Check that pair of locations are empty and do not belong to the moving player
-				if(board[m.row + xDir][m.col + yDir] == m.player)
+				if(this.board[m.row + xDir][m.col + yDir] == m.player)
 					continue;
-				if(board[m.row + xDir][m.col + yDir] == 0)
+				if(this.board[m.row + xDir][m.col + yDir] == 0)
 					continue;
-				if(board[m.row + 2*xDir][m.col + 2*yDir] == m.player)
+				if(this.board[m.row + 2*xDir][m.col + 2*yDir] == m.player)
 					continue;
-				if(board[m.row + 2*xDir][m.col + 2*yDir] == 0)
+				if(this.board[m.row + 2*xDir][m.col + 2*yDir] == 0)
 					continue;
 				// Check if this player is covering opposite end of chain. Skip if not
-				if(board[m.row + 3*xDir][m.col + 3*yDir] != m.player)
+				if(this.board[m.row + 3*xDir][m.col + 3*yDir] != m.player)
 					continue;
 				// A capture was made, clear pair, add back those locations as valid moves and
 				// update captures
-				board[m.row + xDir][m.col + yDir] = 0;
-				board[m.row + 2*xDir][m.col + 2*yDir] = 0;
-				Move newMove = new Move(0, m.row + xDir, m.col + yDir);
-				this.validMoves = newMove.insert(this.validMoves);
+				this.capturedPieces[m.player - 1]++;
+				this.capturedPieces[m.player - 1]++;
+				this.board[m.row + xDir][m.col + yDir] = 0;
+				this.board[m.row + 2*xDir][m.col + 2*yDir] = 0;
+				newMove = new Move(0, m.row + xDir, m.col + yDir);
+				where = -Collections.binarySearch(this.validMoves, newMove) - 1;
+				validMoves.add(where, newMove);
 				newMove = new Move(0, m.row + 2*xDir, m.col + 2*yDir);
-				this.validMoves = newMove.insert(this.validMoves);
-				capturedPieces[m.player - 1] += 2;
+				where = -Collections.binarySearch(this.validMoves, newMove) - 1;
+				validMoves.add(where, newMove);
+
 				System.out.println("Capture made");
-				if(capturedPieces[m.player - 1] >= Board.WINNING_CAPTURES)
+				if(this.capturedPieces[m.player - 1] >= Board.WINNING_CAPTURES)
 					this.winner = m.player;
 			}
 		}
 	}
 
 	/*
-		Checks if tracked number of pieces is equal to the number of spaces on the board
-		@return 	Whether or not the board is full
+		Checks if board is full or if someone has via pente or captures
+		@return 	Whether or not the game is over
 	*/
-	public boolean boardFull(){
-		return this.validMoves.size() == 0;
-	}
-	
 	public boolean gameOver(){
 		return this.winner != -1 || this.validMoves.size() == 0;
 	}
@@ -196,10 +196,17 @@ public class Board{
 	*/
 	@Override
 	public String toString(){
-		String text = "";
-		for(int r = 0; r < this.size; r++){
-			for(int c = 0; c < this.size; c++){
-				text += Integer.toString(this.board[r][c]) + " ";
+		String text = "     ";
+		int i, r, c;
+		// Column header
+		for(i = 0; i < this.size; i++){
+			text += String.format("%-3d", i);
+		}
+		text += "\n";
+		for(r = 0; r < this.size; r++){
+			text += String.format("%-5d", r);
+			for(c = 0; c < this.size; c++){
+				text += String.format("%-3d", this.board[r][c]);
 			}
 			text += "\n";
 		}

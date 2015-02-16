@@ -131,57 +131,6 @@ public class Chain implements Comparable<Chain>{
 		return 1;
 	}
 
-	/*
-		Finds a chain in a given array list that is assumed to be sorted via binary search
-		@param list 	A sorted array list of chains to search through
-		@param move 	The chain to find
-		@return 		The index where the chain is
-	*/
-	public static int find(ArrayList<Chain> list, Chain c){
-		int min = 0;
-		int max = list.size()-1;
-		int i = (min+max)/2;
-		int compare = c.compareTo(list.get(i));
-		while(compare != 0 && min <= max){
-			if(compare < 0)
-				max = i-1;
-			else
-				min = i+1;
-			i = (min + max)/2;
-			compare = c.compareTo(list.get(i));
-		}
-		
-		// Not found, return -1
-		if(min > max)
-			return -1;
-		return i;
-	}
-
-	/*
-		Inserts a chain in a given array list that is assumed to be sorted
-		@param list 	A sorted array list of chains to insert this chain into
-		@return 		The sorted list containing the new chain
-	*/
-	public ArrayList<Chain> insert(ArrayList<Chain> list){
-		int min = 0;
-		int max = list.size();
-		int i = 0;
-		int compare = 0;
-		while(min < max){
-			i = (min + max)/2;
-			compare = this.compareTo(list.get(i));
-			if(compare < 0)
-				max = i-1;
-			else if(compare > 0)
-				min = i+1;
-			else // Already in list
-				return list;
-		}
-
-		list.add(i, this);
-		return list;
-	}
-
 	public int getX(){
 		return this.startR;
 	}
