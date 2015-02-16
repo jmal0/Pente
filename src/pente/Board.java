@@ -31,8 +31,8 @@ public class Board{
 		this.board = new int[size][size];
 		this.capturedPieces = new int[numPlayers];
 		this.validMoves = new ArrayList<Move>();
-		this.chains = new ArrayList<Chain>();
 		this.updateChains();
+		System.out.println(this.chains);
 		this.winner = -1;
 		this.numPlayers = numPlayers;
 		for(int r = 0; r < size; r++){
@@ -55,8 +55,10 @@ public class Board{
 		this.validMoves.remove(Collections.binarySearch(validMoves, m));
 		// Remove any pairs
 		this.makeCaptures(m);
+		System.out.println(this);
 		// Update list of chains
 		this.updateChains();
+		System.out.println(this.chains);
 		this.updateHash(); // This doesn't do anything yet
 		moveNum++;
 
@@ -69,7 +71,7 @@ public class Board{
 	public void updateChains(){
 		// Re-initialize list of chains
 		this.chains = new ArrayList<Chain>(); 
-		int r, c;
+		int r, c, where;
 		// Search for chains at all board positions
 		for(r = 0; r < this.size; r++){
 			for(c = 0; c < this.size; c++){
@@ -77,7 +79,9 @@ public class Board{
 				ArrayList<Chain> newChains = Chain.findChains(this.board, r, c);
 				// Insert new chains
 				for(Chain chain : newChains){
-					int where = -Collections.binarySearch(this.chains, chain) - 1;
+					where = -Collections.binarySearch(this.chains, chain) - 1;
+					if(where < 0)
+						continue;
 					chains.add(where, chain);
 					if(chain.getPlayer() != 0 && chain.getLength() >= Board.WIN_LENGTH)
 						this.winner = chain.getPlayer();

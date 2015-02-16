@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 public class Chain implements Comparable<Chain>{
 	// Pairs of integers describing x and y directions of possible chains
-	public static final int[][] DIRECTIONS = {{1,1},{1,0},{1,-1},{0,1}};
+	public static final int[][] DIRECTIONS = {{1,-1},{1,0},{1,1},{0,1}};
 	// Directions
 	public static final int RIGHT_UP = 0;
 	public static final int RIGHT = 1;
@@ -18,8 +18,6 @@ public class Chain implements Comparable<Chain>{
 	private int length;
 	// Player comprising chain
 	private int player;
-	// Goal for winning chain. Defaults to 5 for 2 player game
-	private int targetLength;
 
 	public Chain(int r, int c, int dir, int len, int p){
 		startR = r;
@@ -27,17 +25,6 @@ public class Chain implements Comparable<Chain>{
 		direction = dir;
 		length = len;
 		player = p;
-		targetLength = 5;
-	}
-
-	public Chain(int r, int c, int dir, int len, int p, int targetLen){
-		startR = r;
-		startC = c;
-		direction = dir;
-		length = len;
-		player = p;
-		// For non-two player games where chains must be 4 long
-		targetLength = targetLen;
 	}
 
 	public boolean isInChain(int r, int c){
@@ -67,8 +54,10 @@ public class Chain implements Comparable<Chain>{
 			// The board position that would come before this position in a chain
 			int[] prevLoc = {r - Chain.DIRECTIONS[i][0], c - Chain.DIRECTIONS[i][1]};
 			// Check if previous board position is valid or if it is already in a chain
-			if(prevLoc[0] < 0 || prevLoc[1] < 0 || prevLoc[1] >= size || b[prevLoc[0]][prevLoc[1]] == b[r][c])
-				continue;
+			if(prevLoc[0] >= 0 && prevLoc[1] >= 0 && prevLoc[1] < size){
+				if(b[prevLoc[0]][prevLoc[1]] == b[r][c])
+					continue;
+			}
 
 			// Continue searching through board until edge or end of chain is reached
 			int length = 1;
