@@ -58,7 +58,6 @@ public class Chain implements Comparable<Chain>{
 				if(b[prevLoc[0]][prevLoc[1]] == b[r][c])
 					continue;
 			}
-
 			// Continue searching through board until edge or end of chain is reached
 			int length = 1;
 			int[] nextLoc = {r + Chain.DIRECTIONS[i][0], c + Chain.DIRECTIONS[i][1]};

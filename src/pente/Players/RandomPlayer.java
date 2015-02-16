@@ -1,7 +1,6 @@
-package pente;
+package pente.Players;
 
-import pente.Player;
-import pente.Move;
+import pente.*;
 import java.util.Random;
 import java.util.ArrayList;
 

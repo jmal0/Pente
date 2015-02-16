@@ -29,14 +29,17 @@ public class Board{
 	public Board(int dimension, int numPlayers){
 		this.size = dimension;
 		this.board = new int[size][size];
+		// Play first move
+		board[9][9] = 1;
 		this.capturedPieces = new int[numPlayers];
 		this.validMoves = new ArrayList<Move>();
 		this.updateChains();
-		System.out.println(this.chains);
 		this.winner = -1;
 		this.numPlayers = numPlayers;
 		for(int r = 0; r < size; r++){
 			for(int c = 0; c < size; c++){
+				if(r == 9 && c == 9)
+					continue;
 				validMoves.add(new Move(0, r, c));
 			}
 		}
@@ -55,10 +58,8 @@ public class Board{
 		this.validMoves.remove(Collections.binarySearch(validMoves, m));
 		// Remove any pairs
 		this.makeCaptures(m);
-		System.out.println(this);
 		// Update list of chains
 		this.updateChains();
-		System.out.println(this.chains);
 		this.updateHash(); // This doesn't do anything yet
 		moveNum++;
 

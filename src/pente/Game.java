@@ -16,13 +16,14 @@ public class Game{
 	public void addPlayer(int which, Player p){
 		players[which-1] = p;
 	}
+
 	/*
-		TODO: Account for players getting knocked out in multiplayer?
+		Plays the game, asking each player for their move on their turn. Displays board and captures between moves
 		@return The number of the winner
 	*/
 	public int playGame(){
-		// First player is player 0
-		int nextPlayer = 0;
+		// First player is player 2 (first move automatically played)
+		int nextPlayer = 1;
 		boolean success;
 		while(!board.gameOver()){
 			// Request move from player whose turn it is
