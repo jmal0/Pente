@@ -4,21 +4,25 @@ import java.util.ArrayList;
 
 public class Board{
 	// Height and width of board (board is assumed to be square)
-	private int size;
+	private final int size;
 	// Array representing board. 
 	private int[][] board;
 	// Array indicating how many of each players pieces have been captured 
 	private int[] capturedPieces;
-	// Same dealio
-	private int moveNum;
 	// Again, used to efficiently keep track of remaining moves
 	private ArrayList<Move> validMoves;
-	// Number of winning player  (-1 if none)
+	// Same dealio
+	private int moveNum;
+	// Number of winning player (-1 if none), used to see if game is over
 	private int winner;
 	// List of contiguous spaces containing same player
 	private ArrayList<Chain> chains;
 	// Length of chain needed to win
 	private final int winLength;
+	// Number of players in game
+	private final int numPlayers;
+	// Number of captures needed to win game
+	private static final int WINNING_CAPTURES = 10;
 
 
 	public Board(int dimension, int numPlayers){
@@ -29,6 +33,7 @@ public class Board{
 		this.chains = new ArrayList<Chain>();
 		this.updateChains();
 		this.winner = -1;
+		this.numPlayers = numPlayers;
 		if(numPlayers == 2)
 			this.winLength = 5;
 		else
@@ -49,7 +54,11 @@ public class Board{
 			return false;
 
 		this.board[m.row][m.col] = m.player;
+		// Update list of valid moves
 		this.validMoves.remove(Move.find(validMoves, m));
+		// Remove any pairs
+		this.makeCaptures(m);
+		// Update list of chains
 		this.updateChains();
 		this.updateHash(); // This doesn't do anything yet
 		moveNum++;
@@ -58,8 +67,11 @@ public class Board{
 	}
 
 	/*
+		Finds all sequences locations with same player or no player
 	*/
 	public void updateChains(){
+		// Re-initialize list of chains
+		this.chains = new ArrayList<Chain>(); 
 		int r, c;
 		// Search for chains at all board positions
 		for(r = 0; r < this.size; r++){
@@ -74,20 +86,73 @@ public class Board{
 				}
 			}
 		}
-		System.out.println(chains.size());
 	}
 	
+	/*
+		Gets all chains for a certain player
+		@return All chains on the board for the given player
+	*/
+	public ArrayList<Chain> getPlayerChains(int player){
+		ArrayList<Chain> playerChains = new ArrayList<Chain>();
+		int i = 0;
+		// Find first instance of a chain of this player
+		while(i < this.chains.size() && this.chains.get(i).getPlayer() != player){
+			i++;
+		}
+
+		// Add all chains of this player
+		while(i < this.chains.size() && this.chains.get(i).getPlayer() == player){
+			playerChains.add(this.chains.get(i));
+			i++;
+		}
+		return playerChains;
+	}
+
+	/*
+		Checks for any pairs captured by this move. Updates board, list of captures, and winner
+		(if necessary)
+		@param m 	Current move
+	*/
+	public void makeCaptures(Move m){
+		for(int xDir = -1; xDir <= 1; xDir++){
+			for(int yDir = -1; yDir <= 1; yDir++){
+				// Check if pair and opposite end is entirely on the board. Skip if not
+				if(m.row + 3*xDir < 0 || m.row + 3*xDir >= this.size || m.col + 3*yDir < 0 || m.col + 3*yDir >= this.size)
+					continue;
+				// Check that pair of locations are empty and do not belong to the moving player
+				if(board[m.row + xDir][m.col + yDir] == m.player)
+					continue;
+				if(board[m.row + xDir][m.col + yDir] == 0)
+					continue;
+				if(board[m.row + 2*xDir][m.col + 2*yDir] == m.player)
+					continue;
+				if(board[m.row + 2*xDir][m.col + 2*yDir] == 0)
+					continue;
+				// Check if this player is covering opposite end of chain. Skip if not
+				if(board[m.row + 3*xDir][m.col + 3*yDir] != m.player)
+					continue;
+				// A capture was made, clear pair, add back those locations as valid moves and
+				// update captures
+				board[m.row + xDir][m.col + yDir] = 0;
+				board[m.row + 2*xDir][m.col + 2*yDir] = 0;
+				Move newMove = new Move(0, m.row + xDir, m.col + yDir);
+				this.validMoves = newMove.insert(this.validMoves);
+				newMove = new Move(0, m.row + 2*xDir, m.col + 2*yDir);
+				this.validMoves = newMove.insert(this.validMoves);
+				capturedPieces[m.player - 1] += 2;
+				System.out.println("Capture made");
+				if(capturedPieces[m.player - 1] >= Board.WINNING_CAPTURES)
+					this.winner = m.player;
+			}
+		}
+	}
+
 	/*
 		Checks if tracked number of pieces is equal to the number of spaces on the board
 		@return 	Whether or not the board is full
 	*/
 	public boolean boardFull(){
 		return this.validMoves.size() == 0;
-	}
-
-//TODO haha yeah lol
-	public int getWinner(){
-		return this.winner;
 	}
 	
 	public boolean gameOver(){
@@ -120,6 +185,10 @@ public class Board{
 		return this.chains;
 	}
 
+	public int getWinner(){
+		return this.winner;
+	}
+
 	/*
 		Returns a string representing the board. Pieces are displayed according to the number of the
 		player that placed them. Empty locations are displayed as zeros
@@ -130,7 +199,7 @@ public class Board{
 		String text = "";
 		for(int r = 0; r < this.size; r++){
 			for(int c = 0; c < this.size; c++){
-				text += Integer.toString(this.board[r][c]);
+				text += Integer.toString(this.board[r][c]) + " ";
 			}
 			text += "\n";
 		}

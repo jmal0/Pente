@@ -99,13 +99,13 @@ public class Chain implements Comparable<Chain>{
 	}
 
 	/*
-		Compares two chains by the following order: length, player number, direction, start column, start row
+		Compares two chains by the following order: player number, length, direction, start column, start row
 		@param other 	The chain to compare to
 		@return 		0 if the chains are identical, +/- 1 if Chain is greater/less according to properties
 	*/
 	public int compareTo(Chain other){
-		if(this.length == other.getLength()){
-			if(this.player == other.getPlayer()){
+		if(this.player == other.getPlayer()){
+			if(this.length == other.getLength()){
 				if(this.direction == other.getDirection()){
 					if(this.startC == other.getY()){
 						if(this.startR == other.getX())
@@ -122,11 +122,11 @@ public class Chain implements Comparable<Chain>{
 					return -1;
 				return 1;
 			}
-			if(this.player < other.getPlayer())
+			if(this.length < other.getLength())
 				return -1;
 			return 1;
 		}
-		if(this.length < other.getLength())
+		if(this.player < other.getPlayer())
 			return -1;
 		return 1;
 	}
@@ -204,6 +204,6 @@ public class Chain implements Comparable<Chain>{
 
 	@Override
 	public String toString(){
-		return String.format("Chain at %d, %d with direction %d for player %d of length %d\n", startR, startC, direction, player, length);
+		return String.format("Chain at %d, %d with direction %d of length %d for player %d \n", startR, startC, direction, length, player);
 	}
 }
