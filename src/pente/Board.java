@@ -45,9 +45,9 @@ public class Board{
 		}
 	}
 
-	/*
-		Makes the specified move if it is valid and returns whether or not it was
-		@param m 	
+	/**
+	* Makes the specified move if it is valid and returns whether or not it was
+	* @param m 	
 	*/
 	public boolean makeMove(Move m){
 		if(this.board[m.row][m.col] != 0)
@@ -66,8 +66,8 @@ public class Board{
 		return true;
 	}
 
-	/*
-		Finds all sequences locations with same player or no player
+	/**
+	* Finds all sequences locations with same player or no player
 	*/
 	public void updateChains(){
 		// Re-initialize list of chains
@@ -91,9 +91,9 @@ public class Board{
 		}
 	}
 	
-	/*
-		Gets all chains for a certain player
-		@return All chains on the board for the given player
+	/**
+	* Gets all chains for a certain player
+	* @return All chains on the board for the given player
 	*/
 	public ArrayList<Chain> getPlayerChains(int player){
 		ArrayList<Chain> playerChains = new ArrayList<Chain>();
@@ -111,10 +111,10 @@ public class Board{
 		return playerChains;
 	}
 
-	/*
-		Checks for any pairs captured by this move. Updates board, list of captures, and winner
-		(if necessary)
-		@param m 	Current move
+	/**
+	* Checks for any pairs captured by this move. Updates board, list of captures, and winner
+	* (if necessary)
+	* @param m 	Current move
 	*/
 	public void makeCaptures(Move m){
 		int xDir, yDir, where;
@@ -156,9 +156,9 @@ public class Board{
 		}
 	}
 
-	/*
-		Checks if board is full or if someone has via pente or captures
-		@return 	Whether or not the game is over
+	/**
+	* Checks if board is full or if someone has via pente or captures
+	* @return 	Whether or not the game is over
 	*/
 	public boolean gameOver(){
 		return this.winner != -1 || this.validMoves.size() == 0;
@@ -194,10 +194,10 @@ public class Board{
 		return this.winner;
 	}
 
-	/*
-		Returns a string representing the board. Pieces are displayed according to the number of the
-		player that placed them. Empty locations are displayed as zeros
-		@return 	the string representing the board
+	/**
+	* Returns a string representing the board. Pieces are displayed according to the number of the
+	* player that placed them. Empty locations are displayed as zeros
+	* @return 	the string representing the board
 	*/
 	@Override
 	public String toString(){
@@ -219,10 +219,10 @@ public class Board{
 		return text;
 	}
 
-	/*
-		Checks if two boards are the same. First a quick check is done to see if the boards contain
-		the same number of pieces. If they do, the board array is checked element by element
-		@return 	whether or not the boards are the same
+	/**
+	* Checks if two boards are the same. First a quick check is done to see if the boards contain
+	* the same number of pieces. If they do, the board array is checked element by element
+	* @return 	whether or not the boards are the same
 	*/
 	/*
 	public boolean equals(Board other){
@@ -246,7 +246,7 @@ public class Board{
 	// TODO: maybe someday
 	public void updateHash(){}
 
-	/*
+	/**
 	*/
 	/*
 	public static ?? getHash(Board b){

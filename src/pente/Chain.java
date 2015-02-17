@@ -40,11 +40,11 @@ public class Chain implements Comparable<Chain>{
 		return (r - startR <= length) && (r - startR >= 0) && (c - startC <= length) && (c - startC >= 0);
 	}
 
-	/*
-		Finds chains originating at r, c in board b
-		@param b 	The board array to search
-		@param r 	The row index of the position to test
-		@param c 	The column index of the position to test
+	/**
+	* Finds chains originating at r, c in board b
+	* @param b 	The board array to search
+	* @param r 	The row index of the position to test
+	* @param c 	The column index of the position to test
 	*/
 	public static ArrayList<Chain> findChains(int[][] b, int r, int c){
 		ArrayList<Chain> chains = new ArrayList<Chain>();
@@ -73,23 +73,23 @@ public class Chain implements Comparable<Chain>{
 		return chains;
 	}
 
-	//TODO
+	//TODO:?
 	public int getDistanceFromChain(int r, int c){
 		return 0;
 	}
-	// TODO
+	//TODO:?
 	public boolean partiallyBlocksChain(int r, int c){
 		return false;
 	}
-	// TODO
+	//TODO:?
 	public boolean completelyBlocksChain(int r, int c){
 		return false;	
 	}
 
-	/*
-		Compares two chains by the following order: player number, length, direction, start column, start row
-		@param other 	The chain to compare to
-		@return 		0 if the chains are identical, +/- 1 if Chain is greater/less according to properties
+	/**
+	* Compares two chains by the following order: player number, length, direction, start column, start row
+	* @param other 	The chain to compare to
+	* @return 		0 if the chains are identical, +/- 1 if Chain is greater/less according to properties
 	*/
 	public int compareTo(Chain other){
 		if(this.player == other.getPlayer()){

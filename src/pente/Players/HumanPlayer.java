@@ -13,6 +13,9 @@ public class HumanPlayer extends Player{
 		in = new Scanner(System.in);
 	}
 
+	/**
+	* Gets move from user command line input
+	*/
 	public Move getMove(Board boardState){
 		ArrayList<Move> moves = boardState.getMoves();
 		Move move;

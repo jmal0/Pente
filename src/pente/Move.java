@@ -11,11 +11,11 @@ public class Move implements Comparable<Move>{
 		col = c;
 	}
 
-	/*
-		Compares two moves ignoring player. Compares row first, then column. Higher row/col returns
-		1.
-		@param other 	The move to compare this move to
-		@return 		0 if the moves are the same, +/- 1 if this move is greater/less than
+	/**
+	* Compares two moves ignoring player. Compares row first, then column. Higher row/col returns
+	* 1.
+	* @param other 	The move to compare this move to
+	* @return 		0 if the moves are the same, +/- 1 if this move is greater/less than
 	*/
 	public int compareTo(Move other){
 		if(this.row == other.row){

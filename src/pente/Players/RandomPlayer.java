@@ -12,6 +12,9 @@ public class RandomPlayer extends Player{
 		rand = new Random();
 	}
 
+	/**
+	* Picks a random move from all possible moves
+	*/
 	public Move getMove(Board boardState){
 		ArrayList<Move> moves = boardState.getMoves();
 		Move move = moves.get(rand.nextInt(moves.size()));
