@@ -3,7 +3,7 @@ package pente;
 import java.util.ArrayList;
 
 public class Move implements Comparable<Move>{
-	public int player, row, col;
+	public final int player, row, col;
 
 	public Move(int p, int r, int c){
 		player = p;
@@ -18,16 +18,15 @@ public class Move implements Comparable<Move>{
 	* @return 		0 if the moves are the same, +/- 1 if this move is greater/less than
 	*/
 	public int compareTo(Move other){
-		if(this.row == other.row){
-			if(this.col == other.col)
-				return 0;
-			if(this.col < other.col)
-				return -1;
-			return 1;
-		}
 		if(this.row < other.row)
 			return -1;
-		return 1;
+		if(this.row > other.row)
+			return 1;
+		if(this.col < other.col)
+			return -1;
+		if(this.col > other.col)
+			return 1;
+		return 0;
 	}
 
 	@Override
