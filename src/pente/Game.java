@@ -24,22 +24,9 @@ public class Game{
 	public int playGame(){
 		// First player is player 2 (first move automatically played)
 		int nextPlayer = 1;
-		boolean success;
 		while(!board.gameOver()){
-			// Request move from player whose turn it is
-			Move m = players[nextPlayer].getMove(board);
-			System.out.println(m);
-			success = board.makeMove(m);
-			if(!success){
-				System.out.println("ERROR");
-				System.exit(0);
-			}
-
-			printCaptures();
-			displayBoard();
-			System.out.println();
-			
-			nextPlayer = (nextPlayer + 1)%players.length;
+			this.playMove(nextPlayer);
+			nextPlayer = (nextPlayer + 1)%this.players.length;
 		}
 
 		return board.getWinner();
@@ -47,24 +34,19 @@ public class Game{
 
 	/**
 	* Steps the game forward one move
-	* @return gameOver whether or not the game should continue
 	*/
-	public boolean playMove(int nextPlayer){
-		if(!this.board.gameOver()){
-			// Request move from player whose turn it is
-			Move m = this.players[nextPlayer].getMove(this.board);
-			System.out.println(m);
-			boolean success = this.board.makeMove(m);
-			if(!success){
-				System.out.println("ERROR");
-				System.exit(0);
-			}
-
-			printCaptures();
-			displayBoard();
-			System.out.println();
+	public void playMove(int nextPlayer){
+		// Request move from player whose turn it is
+		Move m = this.players[nextPlayer].getMove(this.board);
+		System.out.println(m);
+		boolean success = this.board.makeMove(m);
+		if(!success){
+			System.out.println("ERROR");
+			System.exit(0);
 		}
-		return true;
+
+		printCaptures();
+		displayBoard();
 	}
 
 	/**
@@ -86,4 +68,9 @@ public class Game{
 	public Board getBoard(){
 		return this.board;
 	}
+
+	public int getCurrentPlayer(){
+		return ((this.board.getMoveNum()-1) % this.players.length) + 1;
+	}
+
 }
