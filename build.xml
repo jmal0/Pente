@@ -4,12 +4,13 @@
     <property name="src" location="src/pente:src/pente/Players"/>
     <property name="build" location="build"/>
     <property name="config" location="config"/>
-    <property name="jar" location="${build}/jars/pente.jar"/>
+    <property name="lib" location="lib"/>
+    <property name="jar" location="${lib}/pente.jar"/>
 
     <target name="init">
         <!-- Create the build directory structure used by compile -->
         <mkdir dir="${build}/classes"/>
-        <mkdir dir="${build}/jars"/>
+        <mkdir dir="${lib}"/>
     </target>
 
     <target name="compile" depends="init">
@@ -27,15 +28,11 @@
 
     <target name="test" depends="compile">
         <!-- Runs the jar-->
-        <java classname="pente.Pente" failonerror="true" fork="false">
+        <java classname="pente.PenteCL" failonerror="true" fork="false">
             <classpath>
                 <pathelement location="${jar}"/>
                 <pathelement path="${java.class.path}:${build}/classes/pente"/>
             </classpath>
        </java>
-    </target>
-
-    <target name="signjar" depends="compile">
-        <signjar jar="${jar}" alias="apache-group" storepass="secret"/>
     </target>
 </project>

@@ -4,7 +4,7 @@ import pente.Game;
 import pente.Player;
 import pente.Players.*;
 
-public class Pente{
+public class PenteCL{
 
 	public static void main(String[] args){
 		Game game = new Game(2, 19);
