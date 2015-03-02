@@ -8,7 +8,7 @@ public class PenteCL{
 
 	public static void main(String[] args){
 		Game game = new Game(2, 19);
-		game.addPlayer(1, new RandomPlayer(1));
+		game.addPlayer(1, new AIPlayer(1));
 		game.addPlayer(2, new RandomPlayer(2));
 		int winner = game.playGame();
 
