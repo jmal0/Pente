@@ -30,7 +30,7 @@ public class PenteApplet extends Applet{
         this.border = 5+this.spacing/2;
         // Initialize players TODO: make an interface to start a game
         this.game.addPlayer(1, new BrowserPlayer(1, this.game));
-        this.game.addPlayer(2, new RandomPlayer(2));
+        this.game.addPlayer(2, new AIPlayer(2));
         this.colors = new Color[]{Color.BLACK, Color.WHITE};
         // Start game thread
         this.currentMove = new int[] {-1, -1};
