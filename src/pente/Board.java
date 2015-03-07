@@ -1,12 +1,12 @@
 package pente;
 
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
-
 
 public class Board{
     // Height and width of board (board is assumed to be square)
@@ -16,19 +16,19 @@ public class Board{
     // Array indicating how many of each players pieces have been captured 
     private int[] capturedPieces;
     // Again, used to efficiently keep track of remaining moves
-    private ArrayList<Move> validMoves;
+    private List<Move> validMoves;
     // Same dealio
     private int moveNum;
     // Number of winning player (-1 if none), used to see if game is over
     private int winner;
     // List of contiguous spaces containing same player
-    private ArrayList<Chain> chains;
+    private List<Chain> chains;
     // A unique 64 bit integer representing the board. Uses Zobrist hashing
     private long hash;
-    // Length of chain needed to win
-    private static final int WIN_LENGTH = 5;
     // Number of players in game
     private final int numPlayers;
+    // Length of chain needed to win
+    private static final int WIN_LENGTH = 5;
     // Number of captures needed to win game
     private static final int WINNING_CAPTURES = 10;
     // Load hash table values
@@ -42,6 +42,7 @@ public class Board{
         this.winner = -1;
         this.board = new int[size][size];
         this.validMoves = new ArrayList<Move>(dimension*dimension - 1);
+        this.chains = new ArrayList<Chain>();
         this.updateChains();
         
         for(int r = 0; r < size; r++){
@@ -73,9 +74,12 @@ public class Board{
         this.capturedPieces = Arrays.copyOf(copy.getCaptures(), this.numPlayers);
 
         // Valid moves doesn't have to be a deep copy since move is immutable
-        this.validMoves = (ArrayList) copy.getMoves().subList(0, copy.getMoves().size());
-        // Same case for chains
-        this.chains = (ArrayList) copy.getChains().subList(0, copy.getChains().size());
+        //this.validMoves = copy.getMoves().subList(0, copy.getMoves().size());
+        this.validMoves = new ArrayList<Move>(copy.getMoves());
+        
+        // Deep copy is only done before making a move, therefore chain list will be cleared. Create
+        // new array list for the copy
+        this.chains = new ArrayList<Chain>(copy.getChains().size());
     }
 
     /**
@@ -105,21 +109,21 @@ public class Board{
     */
     public void updateChains(){
         // Re-initialize list of chains
-        this.chains = new ArrayList<Chain>(); 
+        this.chains.clear();
         int r, c, where;
         // Search for chains at all board positions
         for(r = 0; r < this.size; r++){
             for(c = 0; c < this.size; c++){
                 // Find chains starting at index r,c
-                ArrayList<Chain> newChains = Chain.findChains(this.board, r, c);
+                List<Chain> newChains = Chain.findChains(this.board, r, c);
                 // Insert new chains
                 for(Chain chain : newChains){
                     where = -Collections.binarySearch(this.chains, chain) - 1;
                     if(where < 0)
                         continue;
                     chains.add(where, chain);
-                    if(chain.getPlayer() != 0 && chain.getLength() >= Board.WIN_LENGTH)
-                        this.winner = chain.getPlayer();
+                    if(chain.player != 0 && chain.length >= Board.WIN_LENGTH)
+                        this.winner = chain.player;
                 }
             }
         }
@@ -129,20 +133,20 @@ public class Board{
     * Gets all chains for a certain player
     * @return All chains on the board for the given player
     */
-    public ArrayList<Chain> getPlayerChains(int player){
-        ArrayList<Chain> playerChains = new ArrayList<Chain>();
-        int i = 0;
+    public List<Chain> getPlayerChains(int player){
+        List<Chain> playerChains = new ArrayList<Chain>();
+        int start = 0;
         // Find first instance of a chain of this player
-        while(i < this.chains.size() && this.chains.get(i).getPlayer() != player){
-            i++;
+        while(start < this.chains.size() && this.chains.get(start).player != player){
+            start++;
         }
 
         // Add all chains of this player
-        while(i < this.chains.size() && this.chains.get(i).getPlayer() == player){
-            playerChains.add(this.chains.get(i));
-            i++;
+        int end = start;
+        while(end < this.chains.size() && this.chains.get(end).player == player){
+            end++;
         }
-        return playerChains;
+        return this.chains.subList(start, end);
     }
 
     /**
@@ -211,7 +215,6 @@ public class Board{
                 removePiece(m.row + xDir, m.col + yDir, m.player);
                 removePiece(m.row + 2*xDir, m.col + 2*yDir, m.player);
                 this.capturedPieces[m.player-1] += 2;
-                System.out.println("Capture made");
 
                 // Check if game has ended
                 if(this.capturedPieces[m.player - 1] >= Board.WINNING_CAPTURES)
@@ -258,7 +261,7 @@ public class Board{
             InputStream in = Board.class.getResourceAsStream(url); 
             BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             int r = 1;
-            ArrayList<long[]> matrix = new ArrayList<long[]>();
+            List<long[]> matrix = new ArrayList<long[]>();
             String line = reader.readLine();
             while(line != null){
                 String[] nums = line.split(",");
@@ -305,11 +308,11 @@ public class Board{
         return this.capturedPieces;
     }
 
-    public ArrayList<Move> getMoves(){
+    public List<Move> getMoves(){
         return this.validMoves;
     }
 
-    public ArrayList<Chain> getChains(){
+    public List<Chain> getChains(){
         return this.chains;
     }
 
@@ -319,5 +322,13 @@ public class Board{
 
     public long getHash(){
         return this.hash;
+    }
+
+    public int getCurrentPlayer(){
+        return (this.moveNum % this.numPlayers) + 1;
+    }
+
+    public int getNextPlayer(){
+        return ((this.moveNum + 1) % this.numPlayers) + 1;
     }
 }

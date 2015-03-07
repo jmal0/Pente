@@ -2,7 +2,7 @@ package pente.Players;
 
 import pente.*;
 import java.util.Scanner;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Collections;
 
 public class HumanPlayer extends Player{
@@ -17,7 +17,7 @@ public class HumanPlayer extends Player{
 	* Gets move from user command line input
 	*/
 	public Move getMove(Board boardState){
-		ArrayList<Move> moves = boardState.getMoves();
+		List<Move> moves = boardState.getMoves();
 		Move move;
 		do{
 			System.out.println("Enter move as row index, column index with no spaces: ");
@@ -30,7 +30,7 @@ public class HumanPlayer extends Player{
 				}
 				int moveR = Integer.parseInt(parts[0]);
 				int moveC = Integer.parseInt(parts[1]);
-				move = new Move(this.getNumber(), moveR, moveC);
+				move = new Move(this.number, moveR, moveC);
 				// Move is in list. Exit loop
 				if(Collections.binarySearch(moves, move) >= 0)
 					break;
