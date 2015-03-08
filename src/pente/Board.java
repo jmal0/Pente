@@ -30,7 +30,7 @@ public class Board{
     // Length of chain needed to win
     private static final int WIN_LENGTH = 5;
     // Number of captures needed to win game
-    private static final int WINNING_CAPTURES = 10;
+    private static final int WINNING_CAPTURES = 5;
     // Load hash table values
     private static final long[][] BOARD_KEYS = Board.loadMatrixFromFile("/BoardHashVals.csv");
     private static final long[][] CAPTURE_KEYS = Board.loadMatrixFromFile("/CaptureHashVals.csv");
@@ -74,7 +74,6 @@ public class Board{
         this.capturedPieces = Arrays.copyOf(copy.getCaptures(), this.numPlayers);
 
         // Valid moves doesn't have to be a deep copy since move is immutable
-        //this.validMoves = copy.getMoves().subList(0, copy.getMoves().size());
         this.validMoves = new ArrayList<Move>(copy.getMoves());
         
         // Deep copy is only done before making a move, therefore chain list will be cleared. Create
@@ -214,7 +213,7 @@ public class Board{
                 // update captures and hash
                 removePiece(m.row + xDir, m.col + yDir, m.player);
                 removePiece(m.row + 2*xDir, m.col + 2*yDir, m.player);
-                this.capturedPieces[m.player-1] += 2;
+                this.capturedPieces[m.player-1]++;
 
                 // Check if game has ended
                 if(this.capturedPieces[m.player - 1] >= Board.WINNING_CAPTURES)
@@ -246,7 +245,7 @@ public class Board{
         // XOR out removed player
         this.hash = this.hash ^ Board.BOARD_KEYS[xPos*this.size + yPos][this.board[xPos][yPos]-1];
         // XOR in a capture
-        this.hash = this.hash ^ Board.CAPTURE_KEYS[this.capturedPieces[capturingPlayer-1]/2][capturingPlayer-1];
+        this.hash = this.hash ^ Board.CAPTURE_KEYS[this.capturedPieces[capturingPlayer-1]][capturingPlayer-1];
 
         this.board[xPos][yPos] = 0;
     }
@@ -330,5 +329,9 @@ public class Board{
 
     public int getNextPlayer(){
         return ((this.moveNum + 1) % this.numPlayers) + 1;
+    }
+
+    public int getLastPlayer(){
+        return ((this.moveNum - 1) % this.numPlayers) + 1;
     }
 }

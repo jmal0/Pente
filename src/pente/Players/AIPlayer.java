@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.ArrayList;
 
 public class AIPlayer extends Player{
+    private static final int MOVE_LIMIT = 20;
     private HashMap<Long, BoardEvaluation> evaluated;
     private int depth;
 
@@ -23,8 +24,7 @@ public class AIPlayer extends Player{
     * Stupid for now, takes move with best evaluation
     */
     public Move getMove(Board boardState){
-        // TODO: make a threshold
-        List<Move> movesToConsider = this.getMovesToConsider(boardState, 1, this.number);
+        List<Move> movesToConsider = this.getMovesToConsider(boardState, this.number);
 
         // Search first layer, find best move from evaluations
         int best = Integer.MIN_VALUE;
@@ -38,6 +38,7 @@ public class AIPlayer extends Player{
             if(eval > best){
                 best = eval;
                 bestMove = m;
+                System.out.println(eval);
             }
         }
 
@@ -50,7 +51,7 @@ public class AIPlayer extends Player{
     * @param b  The current board state
     * @return   A list of valid moves that had an evaluation score above the specified threshold
     */
-    private List<Move> getMovesToConsider(Board b, int threshold, int player){
+    private List<Move> getMovesToConsider(Board b, int player){
         List<Move> validMoves = b.getMoves();
         List<MoveEvaluation> moveEvaluations = new ArrayList<MoveEvaluation>(validMoves.size());
         for(Move m : validMoves){
@@ -67,7 +68,7 @@ public class AIPlayer extends Player{
             i--;
             nextEval = moveEvaluations.get(i).evaluation;
             consideredMoves.add(moveEvaluations.get(i).move);
-        } while(i > 0 && nextEval > threshold);
+        } while(i > 0 && consideredMoves.size() < AIPlayer.MOVE_LIMIT);
 
         return consideredMoves;
     }
@@ -83,13 +84,6 @@ public class AIPlayer extends Player{
     * @return           The evaluation of this node
     */
     private int searchNode(Board b, int depth, int alpha, int beta, boolean maximize){
-        // TODO: don't search children of already evaluated board?
-        BoardEvaluation eval = this.evaluateBoard(b);
-
-        // Don't search any deeper
-        if(depth == 0){
-            return eval.score;
-        }
         // Game over, can't search further. Return win/lose/draw
         if(b.gameOver()){
             int winner = b.getWinner();
@@ -98,10 +92,17 @@ public class AIPlayer extends Player{
             return winner == this.number ? Integer.MAX_VALUE : Integer.MIN_VALUE;
         }
 
+        // Don't search any deeper
+        if(depth == 0){
+            if(b.getLastPlayer() == this.number)
+                return this.evaluateBoard(b).score;
+            // Evaluation is for other player (positive is bad for us), take opposite
+            return -this.evaluateBoard(b).score;
+        }
+
         int currentPlayer = b.getCurrentPlayer();
         boolean maximizeNext = b.getNextPlayer() == this.number;
-        List<Move> moves = this.getMovesToConsider(b, 1, currentPlayer); // TODO: threshold
-        System.out.println(String.format("Evaluating %d moves", moves.size()));
+        List<Move> moves = this.getMovesToConsider(b, currentPlayer);
         if(maximize){
             int best = Integer.MIN_VALUE;
             for(Move m : moves){
@@ -121,7 +122,7 @@ public class AIPlayer extends Player{
                 // Deep copy current board before making move
                 Board childState = new Board(b);
                 childState.makeMove(new Move(currentPlayer, m.row, m.col));
-                best = Math.max(best, searchNode(childState, depth-1, alpha, beta, maximizeNext));
+                best = Math.min(best, searchNode(childState, depth-1, alpha, beta, maximizeNext));
                 beta = Math.min(beta, best);
                 if(beta <= alpha)
                     break;
